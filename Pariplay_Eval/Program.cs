@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Pariplay_Eval.Data;
-using Pariplay_Eval.Middlewares;
+using Pariplay_Eval.Middlewares.Exceptions;
 using Pariplay_Eval.Services;
 using Pariplay_Eval.Services.Interfaces;
 using System.Text.Json.Serialization;
