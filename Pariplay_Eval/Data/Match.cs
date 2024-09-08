@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Pariplay_Eval.Data
 {
@@ -14,8 +13,6 @@ namespace Pariplay_Eval.Data
         public Guid? AwayTeamId { get; set; }
         [NotMapped]
         public Team? AwayTeam { get; set; }
-        public Guid? LeagueId { get; set; }
-        [NotMapped]
-        public League? League { get; set; }
+        public string LeagueName { get; set; }
     }
 }

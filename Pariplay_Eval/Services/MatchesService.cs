@@ -1,4 +1,5 @@
 ﻿using Pariplay_Eval.Data;
+using Pariplay_Eval.Services.Interfaces;
 
 namespace Pariplay_Eval.Services
 {
@@ -27,10 +28,23 @@ namespace Pariplay_Eval.Services
             return context.Matches.FirstOrDefault(x => x.Id == id);
         }
 
-        public void UpdateMatch(Match match)
+        public IEnumerable<Match> GetMatches()
         {
-            Match toUpdate = GetMatch(match.Id.Value);
-            toUpdate = match;
+            return context.Matches;
+        }
+
+        public void UpdateMatch(Guid id, Match match)
+        {
+            Match? toUpdate = GetMatch(id);
+            if (toUpdate is null)
+                return;
+
+            // for simplicity here directly set the writeable prop. Better use AutoMapper or reflection in more complex use cases. Change detector should also be applicable because most of the time we want only what we change to change. What is not changed will be errased since it will come as 'default' value
+            toUpdate.HomeScore = match.HomeScore;
+            toUpdate.AwayScore = match.AwayScore;
+            toUpdate.HomeTeamId = match.HomeTeamId;
+            toUpdate.AwayTeamId = match.AwayTeamId;
+            toUpdate.LeagueName = match.LeagueName;
             context.SaveChanges();
         }
     }

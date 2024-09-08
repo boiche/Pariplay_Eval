@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pariplay_Eval.Data;
-using Pariplay_Eval.Services;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Pariplay_Eval.DTO;
+using Pariplay_Eval.Services.Interfaces;
 
 namespace Pariplay_Eval.Controllers
 {
@@ -15,26 +14,57 @@ namespace Pariplay_Eval.Controllers
         {
             matchesService = service;
         }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var result = matchesService.GetMatches();
+            if (result != null)
+                return Ok(result);
+
+            return NoContent();
+        }
         
         // GET api/<MatchesController>/5
         [HttpGet("{id}")]
-        public Match Get(Guid id)
+        public IActionResult Get(Guid id)
         {
-            return matchesService.GetMatch(id);
+            var result = matchesService.GetMatch(id);
+            if (result is not null) 
+                return Ok(result);
+
+            return NoContent();
         }
 
         // POST api/<MatchesController>
         [HttpPost]
-        public void Post([FromBody] Match match)
+        public void Post([FromBody] MatchDTO match)
         {
-            matchesService.CreateMatch(match);
+            var matchToCreate = new Match()
+            {
+                HomeScore = match.HomeScore,
+                AwayScore = match.AwayScore,
+                HomeTeamId = match.HomeTeamId,
+                AwayTeamId = match.AwayTeamId,
+                LeagueName = match.LeagueName
+            };
+
+            matchesService.CreateMatch(matchToCreate);
         }
 
         // PUT api/<MatchesController>/5
-        [HttpPut("{id}")]
-        public void Put([FromBody] Match match)
+        [HttpPut("{id:guid}")]
+        public void Put(Guid id, [FromBody] MatchDTO match)
         {
-            matchesService.UpdateMatch(match);
+            var matchToUpdate = new Match()
+            {
+                HomeScore = match.HomeScore,
+                AwayScore = match.AwayScore,
+                HomeTeamId = match.HomeTeamId,
+                AwayTeamId = match.AwayTeamId,
+                LeagueName = match.LeagueName
+            };
+            matchesService.UpdateMatch(id, matchToUpdate);
         }
 
         // DELETE api/<MatchesController>/5

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pariplay_Eval.Data;
 
@@ -11,9 +12,11 @@ using Pariplay_Eval.Data;
 namespace Pariplay_Eval.Migrations
 {
     [DbContext(typeof(EvalDbContext))]
-    partial class EvalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908211056_Removed-Leagues")]
+    partial class RemovedLeagues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,46 +43,14 @@ namespace Pariplay_Eval.Migrations
                     b.Property<Guid?>("HomeTeamId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("LeagueName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("LeagueId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HomeTeamId");
 
                     b.ToTable("Matches");
-                });
-
-            modelBuilder.Entity("Pariplay_Eval.Data.Standing", b =>
-                {
-                    b.Property<Guid>("TeamId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("LeagueName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Defeats")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Draws")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GoalDifference")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlayedGames")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Victories")
-                        .HasColumnType("int");
-
-                    b.HasKey("TeamId", "LeagueName");
-
-                    b.ToTable("Standings");
                 });
 
             modelBuilder.Entity("Pariplay_Eval.Data.Team", b =>
@@ -89,6 +60,7 @@ namespace Pariplay_Eval.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -106,22 +78,9 @@ namespace Pariplay_Eval.Migrations
                     b.Navigation("HomeTeam");
                 });
 
-            modelBuilder.Entity("Pariplay_Eval.Data.Standing", b =>
-                {
-                    b.HasOne("Pariplay_Eval.Data.Team", "Team")
-                        .WithMany("Standings")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
             modelBuilder.Entity("Pariplay_Eval.Data.Team", b =>
                 {
                     b.Navigation("Matches");
-
-                    b.Navigation("Standings");
                 });
 #pragma warning restore 612, 618
         }

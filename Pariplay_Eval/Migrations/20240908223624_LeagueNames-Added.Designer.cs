@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pariplay_Eval.Data;
 
@@ -11,9 +12,11 @@ using Pariplay_Eval.Data;
 namespace Pariplay_Eval.Migrations
 {
     [DbContext(typeof(EvalDbContext))]
-    partial class EvalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908223624_LeagueNames-Added")]
+    partial class LeagueNamesAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

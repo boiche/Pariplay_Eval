@@ -1,4 +1,6 @@
-﻿using Pariplay_Eval.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Pariplay_Eval.Data;
+using Pariplay_Eval.Services.Interfaces;
 
 namespace Pariplay_Eval.Services
 {
@@ -26,10 +28,19 @@ namespace Pariplay_Eval.Services
             return context.Teams.FirstOrDefault(x => x.Id == id);
         }
 
-        public void UpdateTeam(Team team)
+        public IEnumerable<Team> GetTeams()
         {
-            Team? toUpdate = GetTeam(team.Id.Value);
-            toUpdate = team;
+            return context.Teams.Include(x => x.Standings).Include(x => x.Matches);
+        }
+
+        public void UpdateTeam(Guid id, Team team)
+        {
+            Team? toUpdate = GetTeam(id);
+            if (toUpdate is null)
+                return;
+
+            // for simplicity here directly set the writeable prop. Better use AutoMapper or reflection in more complex use cases.
+            toUpdate.Name = team.Name;            
             context.SaveChanges();
         }
     }

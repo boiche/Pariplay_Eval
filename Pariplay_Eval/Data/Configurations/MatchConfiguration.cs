@@ -13,11 +13,6 @@ namespace Pariplay_Eval.Data.Configurations
                 .WithMany(x => x.Matches)                
                 .HasConstraintName("FK_Match_HomeTeam")
                 .HasForeignKey(x => x.HomeTeamId);
-            builder
-                .HasOne(x => x.League)
-                .WithMany(x => x.Matches)
-                .IsRequired(false)
-                .HasForeignKey(x => x.LeagueId);
         }
     }
 }

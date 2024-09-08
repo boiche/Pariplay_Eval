@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Pariplay_Eval.Data.Configurations;
 using Pariplay_Eval.Data.Events;
-using System.Text.RegularExpressions;
 
 namespace Pariplay_Eval.Data
 {
@@ -16,13 +14,13 @@ namespace Pariplay_Eval.Data
 
         public DbSet<Team> Teams { get; set; }
         public DbSet<Match> Matches { get; set; }
-        public DbSet<League> Leagues { get; set; }        
+        public DbSet<Standing> Standings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new TeamConfiguration());
             modelBuilder.ApplyConfiguration(new MatchConfiguration());
-            modelBuilder.ApplyConfiguration(new LeagueConfiguration());
+            modelBuilder.ApplyConfiguration(new StandingConfiguration());
             base.OnModelCreating(modelBuilder);
         }
 
@@ -33,27 +31,33 @@ namespace Pariplay_Eval.Data
 
         internal void UpdateStanding(object sender, MatchAddedArgs args)
         {
-            var standingToUpdate = Leagues.First(x => x.Id == args.Match.LeagueId);
-            List<Standing> standings = JsonConvert.DeserializeObject<List<Standing>>(standingToUpdate.Data) ?? new List<Standing>();
             Team homeTeam = Teams.First(x => x.Id == args.Match.HomeTeamId);
             Team awayTeam = Teams.First(x => x.Id == args.Match.AwayTeamId);
-            Standing homeTeamStanding = standings.FirstOrDefault(x => x.TeamName == homeTeam.Name);
+            Standing? homeTeamStanding = Standings.FirstOrDefault(x => x.TeamId == args.Match.HomeTeamId && x.LeagueName == args.Match.LeagueName);
             if (homeTeamStanding is null)
             {
                 homeTeamStanding = new Standing()
                 {
-                    TeamName = homeTeam.Name,
+                    LeagueName = args.Match.LeagueName,
+                    Team = new() 
+                    { 
+                        Name = homeTeam.Name,                        
+                    }
                 };
-                standings.Add(homeTeamStanding);
+                Standings.Add(homeTeamStanding);
             }
-            Standing awayTeamStanding = standings.FirstOrDefault(x => x.TeamName == awayTeam.Name);
+            Standing? awayTeamStanding = Standings.FirstOrDefault(x => x.TeamId == args.Match.AwayTeamId && x.LeagueName == args.Match.LeagueName);
             if (awayTeamStanding is null)
             {
                 awayTeamStanding = new Standing()
                 {
-                    TeamName = awayTeam.Name,
+                    LeagueName = args.Match.LeagueName,
+                    Team = new() 
+                    { 
+                        Name = awayTeam.Name 
+                    },
                 };
-                standings.Add(awayTeamStanding);
+                Standings.Add(awayTeamStanding);
             }
             homeTeamStanding.PlayedGames++;
             awayTeamStanding.PlayedGames++;
@@ -81,12 +85,6 @@ namespace Pariplay_Eval.Data
             homeTeamStanding.GoalDifference += (args.Match.HomeScore - args.Match.AwayScore);
             awayTeamStanding.GoalDifference += (args.Match.AwayScore - args.Match.HomeScore);
 
-            standings.OrderByDescending(x => x.Points)
-                .ThenByDescending(x => x.GoalDifference)
-                .ThenBy(x => x.PlayedGames)
-                .ToList();
-
-            standingToUpdate.Data = JsonConvert.SerializeObject(standings, Formatting.Indented);
             SaveChanges();
         }
     }
